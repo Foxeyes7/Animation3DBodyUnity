@@ -309,17 +309,16 @@ public class csvReader : MonoBehaviour
                         }
 
                         Spine1.position = points[3];
-                        Vector3 directionToTarget1 = End - points[3];// Compute the direction vector from base to target
-                        Quaternion rotationToTarget1 = Quaternion.FromToRotation(Spine1.up, directionToTarget1);
-                        Quaternion finalRotation1 = rotationToTarget1 * Quaternion.Euler(0, 0, 0);
+                        Vector3 directionToTarget1 = new Vector3(End.x - points[3].x, End.y - points[3].y, End.z - points[3].z);// Compute the direction vector from base to target
+                        Quaternion lookRotation1 = Quaternion.LookRotation(directionToTarget1);// Create a rotation that points the z-axis towards the target
+                        Quaternion finalRotation1 = lookRotation1 * Quaternion.Euler(-90, 0, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
                         Spine1.rotation = finalRotation1;
 
                         Spine2.position = points[7];
-
-                        Vector3 directionToTarget2 = End - points[7];// Compute the direction vector from base to target
-                        Quaternion rotationToTarget2 = Quaternion.FromToRotation(Spine2.up, directionToTarget2);
-                        Spine2.rotation = rotationToTarget2 * Spine2.rotation;
-
+                        Vector3 directionToTarget2 = new Vector3(End.x - points[7].x, End.y - points[7].y, End.z - points[7].z);// Compute the direction vector from base to target
+                        Quaternion lookRotation2 = Quaternion.LookRotation(directionToTarget2);// Create a rotation that points the z-axis towards the target
+                        Quaternion finalRotation2 = lookRotation2 * Quaternion.Euler(-90, 0, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
+                        Spine2.rotation = finalRotation2;
                     }
                 }
             }
