@@ -38,7 +38,7 @@ public class CharacterIKController : MonoBehaviour
 
     void OnAnimatorIK()
     {
-        Debug.Log("OnAnimatorIK called");
+        //Debug.Log("OnAnimatorIK called");
         if (csvreader != null)
         {
             position = csvreader.GetPositions();
@@ -67,33 +67,22 @@ public class CharacterIKController : MonoBehaviour
             animator.SetLookAtWeight(1.0f);
             animator.SetLookAtPosition(position[0]);
 
-            Transform spine = animator.GetBoneTransform(HumanBodyBones.Spine);
+            // Adjust the chest position and rotation
+            Vector3 chestDirection = (position[15] + position[16]) / 2f; // direction to the average of both wrists
+            Vector3 desiredChestUp = Vector3.up; // This could be another vector depending on your situation
 
-            Vector3 position1 = position[11];
-            Vector3 position2 = position[12];
-            Vector3 Start = (position1 + position2) / 2.0f; // top of the spine
+            // Calculate the rotation that looks in the chestDirection and leans the chest towards desiredChestUp
+            Quaternion desiredRotation = Quaternion.LookRotation(chestDirection, desiredChestUp);
 
-            Vector3 position3 = position[23];
-            Vector3 position4 = position[24];
-            Vector3 End = (position3 + position4) / 2.0f; // bottom of the spine
+            // Rotate the desired rotation 180 degrees around the X axis
+            desiredRotation *= Quaternion.Euler(180, 0, 0);
 
-            Vector3 direction = End - Start;
-            float interval = 1.0f / (10 + 1);  // Definition of  how much points we want for the spine
+            Vector3 bustPosition = Vector3.Lerp((position[23] + position[24]) / 2.0f, (position[11] + position[12]) / 2.0f, 0.5f); // position between the shoulders and the hips
+            Vector3 spineOffset = animator.GetBoneTransform(HumanBodyBones.Spine).position - animator.transform.position;
 
-            List<Vector3> points = new List<Vector3>();
-            for (int j = 1; j <= 10; j++)
-            {
-                Vector3 point = Start + direction * interval * j; // here we create the points between the start and the end
-                points.Add(point);
-            }
-
-            spine.position = points[5];
-
-            // Set the body position and rotation based on a calculated value
-            /*Vector3 calculatedBodyPosition = // Calculated based on your needs
-            Quaternion calculatedBodyRotation = // Calculated based on your needs
-            animator.bodyPosition = calculatedBodyPosition;
-            animator.bodyRotation = calculatedBodyRotation;*/
+            animator.transform.position = bustPosition - spineOffset;
+            animator.transform.rotation = desiredRotation;
         }
     }
 }
+ 
