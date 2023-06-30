@@ -1026,6 +1026,44 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 373345191}
   m_CullTransparentMesh: 1
+--- !u!1 &392781028 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 9d9f07b025f76c94e9590552b2cae810, type: 3}
+  m_PrefabInstance: {fileID: 106782640}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &392781030
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 392781028}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 9d9f07b025f76c94e9590552b2cae810, type: 3}
+  m_Controller: {fileID: 9100000, guid: 31c08ee1ded1e0f45a6f56c86a4289ec, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &392781032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 392781028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15ae92513df0db1409e2541862d4264e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &528800806
 GameObject:
   m_ObjectHideFlags: 0
@@ -1641,6 +1679,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 632874c7dcc55744b841b97bfc2fd760, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  leftHandIKTarget: {fileID: 0}
+  rightHandIKTarget: {fileID: 0}
+  leftFootIKTarget: {fileID: 0}
+  rightFootIKTarget: {fileID: 0}
+  headIKTarget: {fileID: 0}
+  chestIKTarget: {fileID: 0}
+  ikTarget: {fileID: 0}
   prefabCube: {fileID: 118279375784236610, guid: 5c61381a57d3f4d4bb8a1592df6300a3, type: 3}
   prefabEmpty: {fileID: 1856636315290261747, guid: f40a40880deac6b47aa5023f55ac56a2, type: 3}
   prefabLine: {fileID: 2393243946496338530, guid: 71da7aab907d17c46b26194124ada80d, type: 3}

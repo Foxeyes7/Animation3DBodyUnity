@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class csvReader : MonoBehaviour
 {
     private List<Vector3> pointList = new List<Vector3>();
-    private List<GameObject> gameObjects = new List<GameObject>();
+    public List<GameObject> gameObjects = new List<GameObject>();
 
     private List<List<Vector3>> globalListCam1;
     private List<List<Vector3>> globalListCam2;
@@ -16,6 +16,14 @@ public class csvReader : MonoBehaviour
     private List<List<Vector3>> globalListCam4;
 
     private GameObject yBot;
+    private Animator animator;
+    public Transform leftHandIKTarget, rightHandIKTarget; // The target positions for the hands
+    public Transform leftFootIKTarget, rightFootIKTarget; // The target positions for the feet
+    public Transform headIKTarget, chestIKTarget; // The target positions for the head and chest
+    private Vector3[] position = new Vector3[33];
+
+    public Transform ikTarget;
+
 
     [SerializeField]
     private GameObject prefabCube, prefabEmpty, prefabLine;
@@ -53,6 +61,7 @@ public class csvReader : MonoBehaviour
         directories = Directory.GetDirectories(@"..\Mediapipe-3D-Transcription-main\Assets\CSV");
 
         yBot = GameObject.Find("Y_Bot");
+        animator = yBot.GetComponent<Animator>();
 
         foreach (string dir in directories)
         {
@@ -70,256 +79,19 @@ public class csvReader : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        int frameCountOnVideo = camManager.GetFrameCount();
+        int frameCountOnVideo = camManager.GetFrameCount(); 
         int currentFrameOnVideo = camManager.GetFrameIndex();
 
         if (runExercice)
         {
             int frameDiff = frameCountOnVideo - minFrameCount;
-            if(currentFrameOnVideo > frameDiff)
+            if (currentFrameOnVideo > frameDiff)
             {
                 for (int i = 0; i < pointList.Count; i++)
                 {
-                    gameObjects[i].transform.position = globalListCam4[currentFrameOnVideo-frameDiff][i];
-
-                    if (yBot == null)
-                    {
-                        Debug.LogError("Y_Bot not found");
-                        return;
-                    }
-
-                    /*
-                    if (i == 0)
-                    {
-                        Transform Head = yBot.transform.GetChild(2).GetChild(2).GetChild(0).GetChild(0).GetChild(1).GetChild(0);
-                        if (Head != null)
-                        {
-                            Head.position = globalListCam4[currentFrameOnVideo - frameDiff][0];
-                            Quaternion lookRotation = Quaternion.Euler(globalListCam4[currentFrameOnVideo - frameDiff][0]);
-                            Quaternion finalRotation = lookRotation * Quaternion.Euler(-90, 180, 0);
-                            Head.rotation = finalRotation;
-                        }
-                    }*/
-
-                    //-------------------------------------------- LEFT ARM ----------------------------------------------//
-                    if (i == 11)
-                    {
-                        Transform LeftForeArm = yBot.transform.GetChild(2).GetChild(2).GetChild(0).GetChild(0).GetChild(0).GetChild(0);
-                        if (LeftForeArm != null)
-                        {
-                            LeftForeArm.position = globalListCam4[currentFrameOnVideo - frameDiff][11];
-                            Vector3 jointBasePosition = globalListCam4[currentFrameOnVideo - frameDiff][11];// Position of the parent joint
-                            Vector3 jointTargetPosition = globalListCam4[currentFrameOnVideo - frameDiff][13];// Position of the target joint
-                            Vector3 directionToTarget = jointTargetPosition - jointBasePosition;// Compute the direction vector from base to target
-                            Quaternion lookRotation = Quaternion.LookRotation(directionToTarget);// Create a rotation that points the z-axis towards the target
-                            Quaternion finalRotation = lookRotation * Quaternion.Euler(90, 0, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
-                            LeftForeArm.rotation = finalRotation; // Apply the rotation to the joint
-                        }
-                    }
-                    if (i == 13)
-                    {
-                        Transform LeftForeArm = yBot.transform.GetChild(2).GetChild(2).GetChild(0).GetChild(0).GetChild(0).GetChild(0).GetChild(0);
-                        if (LeftForeArm != null){
-                            LeftForeArm.position = globalListCam4[currentFrameOnVideo - frameDiff][13];
-                            Vector3 jointBasePosition = globalListCam4[currentFrameOnVideo - frameDiff][13];// Position of the parent joint
-                            Vector3 jointTargetPosition = globalListCam4[currentFrameOnVideo - frameDiff][15];// Position of the target joint
-                            Vector3 directionToTarget = jointTargetPosition - jointBasePosition;// Compute the direction vector from base to target
-                            Quaternion lookRotation = Quaternion.LookRotation(directionToTarget);// Create a rotation that points the z-axis towards the target
-                            Quaternion finalRotation = lookRotation * Quaternion.Euler(90, 0, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
-                            LeftForeArm.rotation = finalRotation; // Apply the rotation to the joint
-                        }
-                    }
-                    if (i == 15)
-                    {
-                        Transform RightWrist = yBot.transform.GetChild(2).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).GetChild(0);
-                        if (RightWrist != null)
-                        {
-                            RightWrist.position = globalListCam4[currentFrameOnVideo - frameDiff][15];
-                            Vector3 jointBasePosition = globalListCam4[currentFrameOnVideo - frameDiff][15];// Position of the parent joint
-                            Vector3 position1 = globalListCam4[currentFrameOnVideo - frameDiff][17]; ;  // Premier Vector3
-                            Vector3 position2 = globalListCam4[currentFrameOnVideo - frameDiff][19]; ;  // Deuxième Vector3
-                            Vector3 averagePosition = (position1 + position2) / 2.0f; // Mean of the hand position
-                            Vector3 directionToTarget = averagePosition - jointBasePosition;// Compute the direction vector from base to target
-                            Quaternion lookRotation = Quaternion.LookRotation(directionToTarget);// Create a rotation that points the z-axis towards the target
-                            Quaternion finalRotation = lookRotation * Quaternion.Euler(90, 0, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
-                            RightWrist.rotation = finalRotation;
-                        }
-                    }
-
-                    //-------------------------------------------- RIGHT ARM ----------------------------------------------//
-                    if (i == 12)
-                    {
-                        Transform LeftForeArm = yBot.transform.GetChild(2).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0);
-                        if (LeftForeArm != null)
-                        {
-                            LeftForeArm.position = globalListCam4[currentFrameOnVideo - frameDiff][12];
-                            Vector3 jointBasePosition = globalListCam4[currentFrameOnVideo - frameDiff][12];// Position of the parent joint
-                            Vector3 jointTargetPosition = globalListCam4[currentFrameOnVideo - frameDiff][14];// Position of the target joint
-                            Vector3 directionToTarget = jointTargetPosition - jointBasePosition;// Compute the direction vector from base to target
-                            Quaternion lookRotation = Quaternion.LookRotation(directionToTarget);// Create a rotation that points the z-axis towards the target
-                            Quaternion finalRotation = lookRotation * Quaternion.Euler(90, 0, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
-                            LeftForeArm.rotation = finalRotation; // Apply the rotation to the joint
-                        }
-                    }
-                    if (i == 14)
-                    {
-                        Transform RightForeArm = yBot.transform.GetChild(2).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0);
-                        if (RightForeArm != null){
-                            RightForeArm.position = globalListCam4[currentFrameOnVideo - frameDiff][14];
-                            Vector3 jointBasePosition = globalListCam4[currentFrameOnVideo - frameDiff][14];// Position of the parent joint
-                            Vector3 jointTargetPosition = globalListCam4[currentFrameOnVideo - frameDiff][16];// Position of the target joint
-                            Vector3 directionToTarget = jointTargetPosition - jointBasePosition;// Compute the direction vector from base to target
-                            Quaternion lookRotation = Quaternion.LookRotation(directionToTarget);// Create a rotation that points the z-axis towards the target
-                            Quaternion finalRotation = lookRotation * Quaternion.Euler(90, 0, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
-                            RightForeArm.rotation = finalRotation; // Apply the rotation to the joint
-                        }
-                    }
-                    if (i == 16)
-                    {
-                        Transform RightWrist = yBot.transform.GetChild(2).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).GetChild(0);
-                        if (RightWrist != null){
-                            RightWrist.position = globalListCam4[currentFrameOnVideo - frameDiff][16];
-                            Vector3 jointBasePosition = globalListCam4[currentFrameOnVideo - frameDiff][16];// Position of the parent joint
-                            Vector3 position1 = globalListCam4[currentFrameOnVideo - frameDiff][18]; ;  // Premier Vector3
-                            Vector3 position2 = globalListCam4[currentFrameOnVideo - frameDiff][20]; ;  // Deuxième Vector3
-                            Vector3 averagePosition = (position1 + position2) / 2.0f; // Mean of the hand position
-                            Vector3 directionToTarget = averagePosition - jointBasePosition;// Compute the direction vector from base to target
-                            Quaternion lookRotation = Quaternion.LookRotation(directionToTarget);// Create a rotation that points the z-axis towards the target
-                            Quaternion finalRotation = lookRotation * Quaternion.Euler(90, 0, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
-                            RightWrist.rotation = finalRotation;
-                        }
-                    }
-
-                    //-------------------------------------------- LEFT LEG ----------------------------------------------//
-
-                    if (i == 23)
-                    {
-                        Transform LeftUpLeg = yBot.transform.GetChild(2).GetChild(0);
-                        if (LeftUpLeg != null)
-                        {
-                            LeftUpLeg.position = globalListCam4[currentFrameOnVideo - frameDiff][i];
-                            Vector3 jointBasePosition = globalListCam4[currentFrameOnVideo - frameDiff][i]; // Position of the parent joint
-                            Vector3 jointTargetPosition = globalListCam4[currentFrameOnVideo - frameDiff][25]; // Position of the target joint
-                            Vector3 directionToTarget = jointTargetPosition - jointBasePosition; // Compute the direction vector from base to target
-                            Quaternion lookRotation = Quaternion.LookRotation(directionToTarget); // Create a rotation that points the z-axis towards the target
-                            Quaternion finalRotation = lookRotation * Quaternion.Euler(-90, 180, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
-                            LeftUpLeg.rotation = finalRotation;
-                        }
-                    }
-
-                    if (i == 25)
-                    {
-                        Transform leftLegJoint = yBot.transform.GetChild(2).GetChild(0).GetChild(0);
-                        if (leftLegJoint != null)
-                        {
-                            leftLegJoint.position = globalListCam4[currentFrameOnVideo - frameDiff][i];
-                            Vector3 jointBasePosition = globalListCam4[currentFrameOnVideo - frameDiff][i]; // Position of the parent joint
-                            Vector3 jointTargetPosition = globalListCam4[currentFrameOnVideo - frameDiff][27]; // Position of the target joint
-                            Vector3 directionToTarget = jointTargetPosition - jointBasePosition; // Compute the direction vector from base to target
-                            Quaternion lookRotation = Quaternion.LookRotation(directionToTarget); // Create a rotation that points the z-axis towards the target
-                            Quaternion finalRotation = lookRotation * Quaternion.Euler(-90, 180, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
-                            leftLegJoint.rotation = finalRotation;
-                        }
-                    }
-
-                    if (i == 27)
-                    {
-                        Transform LeftFoot = yBot.transform.GetChild(2).GetChild(0).GetChild(0).GetChild(0);
-                        if (LeftFoot != null)
-                        {
-                            LeftFoot.position = globalListCam4[currentFrameOnVideo - frameDiff][i];
-                            Vector3 jointBasePosition = globalListCam4[currentFrameOnVideo - frameDiff][i]; // Position of the parent joint
-                            Vector3 jointTargetPosition = globalListCam4[currentFrameOnVideo - frameDiff][31]; // Position of the target joint
-                            Vector3 directionToTarget = jointTargetPosition - jointBasePosition; // Compute the direction vector from base to target
-                            Quaternion lookRotation = Quaternion.LookRotation(directionToTarget); // Create a rotation that points the z-axis towards the target
-                            Quaternion finalRotation = lookRotation * Quaternion.Euler(-90, 180, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
-                            LeftFoot.rotation = finalRotation;
-                        }
-                    }
-
-                    //-------------------------------------------- RIGHT LEG ---------------------------------------------//
-
-                    if (i == 24)
-                    {
-                        Transform RightUpLeg = yBot.transform.GetChild(2).GetChild(1);
-                        if (RightUpLeg != null)
-                        {
-                            RightUpLeg.position = globalListCam4[currentFrameOnVideo - frameDiff][i];
-                            Vector3 jointBasePosition = globalListCam4[currentFrameOnVideo - frameDiff][i]; // Position of the parent joint
-                            Vector3 jointTargetPosition = globalListCam4[currentFrameOnVideo - frameDiff][26]; // Position of the target joint
-                            Vector3 directionToTarget = jointTargetPosition - jointBasePosition; // Compute the direction vector from base to target
-                            Quaternion lookRotation = Quaternion.LookRotation(directionToTarget); // Create a rotation that points the z-axis towards the target
-                            Quaternion finalRotation = lookRotation * Quaternion.Euler(-90, 180, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
-                            RightUpLeg.rotation = finalRotation;
-                        }
-                    }
-
-                    if (i == 26)
-                    {
-                        Transform RightLegJoint = yBot.transform.GetChild(2).GetChild(1).GetChild(0);
-                        if (RightLegJoint != null)
-                        {
-                            RightLegJoint.position = globalListCam4[currentFrameOnVideo - frameDiff][i];
-                            Vector3 jointBasePosition = globalListCam4[currentFrameOnVideo - frameDiff][i]; // Position of the parent joint
-                            Vector3 jointTargetPosition = globalListCam4[currentFrameOnVideo - frameDiff][28]; // Position of the target joint
-                            Vector3 directionToTarget = jointTargetPosition - jointBasePosition; // Compute the direction vector from base to target
-                            Quaternion lookRotation = Quaternion.LookRotation(directionToTarget); // Create a rotation that points the z-axis towards the target
-                            Quaternion finalRotation = lookRotation * Quaternion.Euler(-90, 180, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
-                            RightLegJoint.rotation = finalRotation;
-                        }
-                    }
-
-                    if (i == 28)
-                    {
-                        Transform RightFoot = yBot.transform.GetChild(2).GetChild(1).GetChild(0).GetChild(0);
-                        if (RightFoot != null)
-                        {
-                            RightFoot.position = globalListCam4[currentFrameOnVideo - frameDiff][i];
-                            Vector3 jointBasePosition = globalListCam4[currentFrameOnVideo - frameDiff][i]; // Position of the parent joint
-                            Vector3 jointTargetPosition = globalListCam4[currentFrameOnVideo - frameDiff][32]; // Position of the target joint
-                            Vector3 directionToTarget = jointTargetPosition - jointBasePosition; // Compute the direction vector from base to target
-                            Quaternion lookRotation = Quaternion.LookRotation(directionToTarget); // Create a rotation that points the z-axis towards the target
-                            Quaternion finalRotation = lookRotation * Quaternion.Euler(-90, 180, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
-                            RightFoot.rotation = finalRotation;
-                        }
-                    }
-
-                    //-------------------------------------------- Spine ---------------------------------------------//
-
-                    Transform Spine1 = yBot.transform.GetChild(2).GetChild(2).GetChild(0);
-                    Transform Spine2 = yBot.transform.GetChild(2);
-                    if (Spine1 != null && Spine2 != null)
-                    {
-                        Vector3 position1 = globalListCam4[currentFrameOnVideo - frameDiff][11];
-                        Vector3 position2 = globalListCam4[currentFrameOnVideo - frameDiff][12];
-                        Vector3 Start = (position1 + position2) / 2.0f;
-
-                        Vector3 position3 = globalListCam4[currentFrameOnVideo - frameDiff][23];
-                        Vector3 position4 = globalListCam4[currentFrameOnVideo - frameDiff][24];
-                        Vector3 End = (position3 + position4) / 2.0f;
-
-                        Vector3 direction = End - Start;
-                        float interval = 1.0f / (9 + 1);  // Pour obtenir cinq points, nous divisons par six
-
-                        List<Vector3> points = new List<Vector3>();
-                        for (int j = 1; j <= 9; j++)
-                        {
-                            Vector3 point = Start + direction * interval * j;
-                            points.Add(point);
-                        }
-
-                        Spine1.position = points[3];
-                        Vector3 directionToTarget1 = new Vector3(End.x - points[3].x, End.y - points[3].y, End.z - points[3].z);// Compute the direction vector from base to target
-                        Quaternion lookRotation1 = Quaternion.LookRotation(directionToTarget1);// Create a rotation that points the z-axis towards the target
-                        Quaternion finalRotation1 = lookRotation1 * Quaternion.Euler(-90, 0, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
-                        Spine1.rotation = finalRotation1;
-
-                        Spine2.position = points[7];
-                        Vector3 directionToTarget2 = new Vector3(End.x - points[7].x, End.y - points[7].y, End.z - points[7].z);// Compute the direction vector from base to target
-                        Quaternion lookRotation2 = Quaternion.LookRotation(directionToTarget2);// Create a rotation that points the z-axis towards the target
-                        Quaternion finalRotation2 = lookRotation2 * Quaternion.Euler(-90, 0, 0); // Adjust the rotation 90 degrees around the x-axis to make the y-axis point towards the target
-                        Spine2.rotation = finalRotation2;
-                    }
+                    gameObjects[i].transform.position = globalListCam4[currentFrameOnVideo - frameDiff][i];
+                    position[i] = globalListCam4[currentFrameOnVideo - frameDiff][i];
+                    GetPositions();
                 }
             }
         }
@@ -433,7 +205,7 @@ public class csvReader : MonoBehaviour
         if (runExercice)
         {
             InstanciateCube();
-            //InstanciateLines();
+            InstanciateLines();
             text.text = dropdown.options[dropdown.value].text + " is running ...";
         }
         else
@@ -494,7 +266,7 @@ public class csvReader : MonoBehaviour
             GameObject cube = Instantiate(prefabCube, globalListCam4[0][i], Quaternion.identity);
             cube.transform.SetParent(people.transform);
             cube.name = i.ToString();
-            cube.GetComponent<Renderer>().enabled = false;
+            //cube.GetComponent<Renderer>().enabled = false;
             gameObjects.Add(cube);
 
         }
@@ -521,5 +293,22 @@ public class csvReader : MonoBehaviour
                 line.GetComponent<lineTracer>().setIndexLine(i);
             }
         }
+    }
+
+    public Vector3[] GetPositions()
+    {
+        if (runExercice)
+        {
+            return position;
+        }
+        else
+        {
+            return new Vector3[33];
+        }
+    }
+
+    public List<GameObject> GetGameObjects()
+    {
+        return gameObjects;
     }
 }
