@@ -67,21 +67,28 @@ public class CharacterIKController : MonoBehaviour
             animator.SetLookAtWeight(1.0f);
             animator.SetLookAtPosition(position[0]);
 
-            // Adjust the chest position and rotation
-            Vector3 chestDirection = (position[15] + position[16]) / 2f; // direction to the average of both wrists
-            Vector3 desiredChestUp = Vector3.up; // This could be another vector depending on your situation
+            //......................................//
 
-            // Calculate the rotation that looks in the chestDirection and leans the chest towards desiredChestUp
-            Quaternion desiredRotation = Quaternion.LookRotation(chestDirection, desiredChestUp);
 
-            // Rotate the desired rotation 180 degrees around the X axis
-            desiredRotation *= Quaternion.Euler(180, 0, 0);
+            //calcul des vecteurs du plan 
+            Vector3 side1 = position[11] - position[12];
+            Vector3 side2 = position[23] - position[12];
 
-            Vector3 bustPosition = Vector3.Lerp((position[23] + position[24]) / 2.0f, (position[11] + position[12]) / 2.0f, 0.5f); // position between the shoulders and the hips
+            Vector3 upDirection = Vector3.Cross(side1, side2).normalized;
+
+            Vector3 bustPosition = Vector3.Lerp((position[23] + position[24]) / 2.0f, (position[11] + position[12]) / 2.0f, 0.5f);
+
+            Vector3 upFromCenterPoint = bustPosition + upDirection;
+
+            Vector3 upDirectionFromCenter = (upFromCenterPoint - bustPosition).normalized;
+
+            Quaternion desiredRotation = Quaternion.LookRotation(upDirectionFromCenter, animator.transform.up);
+
             Vector3 spineOffset = animator.GetBoneTransform(HumanBodyBones.Spine).position - animator.transform.position;
 
             animator.transform.position = bustPosition - spineOffset;
             animator.transform.rotation = desiredRotation;
+
         }
     }
 }
