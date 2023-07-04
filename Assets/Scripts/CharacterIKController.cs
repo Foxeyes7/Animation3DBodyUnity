@@ -51,10 +51,18 @@ public class CharacterIKController : MonoBehaviour
         if (csvreader != null)
         {
             position = csvreader.GetPositions();
+            Vector3 side1;
+            Vector3 side2;
 
             // Set the left hand IK
-            Vector3 directionLH = ((position[19] + position[17]) / 2.0f); // La direction vers laquelle la main doit "regarder"
-            Quaternion rotationLH = Quaternion.LookRotation(directionLH); // Crée une rotation qui oriente l'avant du transform vers la direction spécifiée
+
+            Vector3 pointLH = ((position[19] + position[17]) / 2.0f);
+            Vector3 fdDirectionLH = pointLH - position[15];
+            side1 = position[19] - position[15];
+            side2 = position[17] - position[15];
+            Vector3 upDirectionLH = Vector3.Cross(side2, side1).normalized;
+
+            Quaternion rotationLH = Quaternion.LookRotation(fdDirectionLH, upDirectionLH); 
 
             animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1.0f);
             animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1.0f);
@@ -63,8 +71,13 @@ public class CharacterIKController : MonoBehaviour
 
 
             // Set the right hand IK
-            Vector3 directionRH = ((position[20] + position[18]) / 2.0f); // La direction vers laquelle la main doit "regarder"
-            Quaternion rotationRH = Quaternion.LookRotation(directionRH); // Crée une rotation qui oriente l'avant du transform vers la direction spécifiée
+            Vector3 pointRH = ((position[20] + position[18]) / 2.0f);
+            Vector3 fdDirectionRH = pointRH - position[16];
+            side1 = position[20] - position[16];
+            side2 = position[18] - position[16];
+            Vector3 upDirectionRH = Vector3.Cross(side1, side2).normalized;
+
+            Quaternion rotationRH = Quaternion.LookRotation(fdDirectionRH, upDirectionRH);
 
             animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1.0f);
             animator.SetIKRotationWeight(AvatarIKGoal.RightHand, 1.0f);
@@ -72,46 +85,38 @@ public class CharacterIKController : MonoBehaviour
             animator.SetIKRotation(AvatarIKGoal.RightHand, rotationRH);
 
             // Set the left foot IK
+            Vector3 directionLF = position[29].normalized;
+            Quaternion rotationLF = Quaternion.LookRotation(directionLF);
+
             animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1.0f);
             animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1.0f);
             animator.SetIKPosition(AvatarIKGoal.LeftFoot, position[27]);
+            animator.SetIKRotation(AvatarIKGoal.LeftFoot, rotationLF);
 
             // Set the right foot IK
+            Vector3 directionRF = position[30].normalized;
+            Quaternion rotationRF = Quaternion.LookRotation(directionRF);
+
             animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1.0f);
             animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 1.0f);
             animator.SetIKPosition(AvatarIKGoal.RightFoot, position[28]);
+            animator.SetIKRotation(AvatarIKGoal.RightFoot, rotationRF);
 
             // Set the head IK
             animator.SetLookAtWeight(1.0f);
             animator.SetLookAtPosition(position[0]);
 
-            //calcul des vecteurs du plan 
-            Vector3 side1 = position[11] - position[12];
-            Vector3 side2 = position[23] - position[12];
+            // Set the body  
+            side1 = position[11] - position[12];
+            side2 = position[23] - position[12];
 
             Vector3 upDirection = Vector3.Cross(side1, side2).normalized;
-
             Vector3 bustPosition = Vector3.Lerp((position[23] + position[24]) / 2.0f, (position[11] + position[12]) / 2.0f, 0.5f);
-
             Vector3 upFromCenterPoint = bustPosition + upDirection;
-
             Vector3 upDirectionFromCenter = (upFromCenterPoint - bustPosition).normalized;
-
             Vector3 CenterToHead = (((position[11] + position[12]) / 2.0f) - bustPosition).normalized;
 
-            //refCube1.transform.position = upDirectionFromCenter;
-            //refCube2.transform.position = bustPosition;
-
-            /*LineRenderer line1 = refLine1.GetComponent<LineRenderer>();
-            line1.SetPosition(0, upDirectionFromCenter);
-            line1.SetPosition(1, upFromCenterPoint);*/
-
-            /*LineRenderer line2 = refLine2.GetComponent<LineRenderer>();
-            line2.SetPosition(0, upDirectionFromCenter);
-            line2.SetPosition(1, upFromCenterPoint);*/
-
             Quaternion desiredRotation = Quaternion.LookRotation(upDirectionFromCenter, CenterToHead);
-
             Vector3 spineOffset = animator.GetBoneTransform(HumanBodyBones.Spine).position - animator.transform.position;
 
             animator.transform.position = bustPosition - spineOffset;
