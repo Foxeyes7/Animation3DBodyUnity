@@ -47,7 +47,6 @@ public class CharacterIKController : MonoBehaviour
 
     void OnAnimatorIK()
     {
-        //Debug.Log("OnAnimatorIK called");
         if (csvreader != null)
         {
             position = csvreader.GetPositions();
@@ -55,9 +54,8 @@ public class CharacterIKController : MonoBehaviour
             Vector3 side2;
 
             // Set the left hand IK
-
             Vector3 pointLH = ((position[19] + position[17]) / 2.0f);
-            Vector3 fdDirectionLH = pointLH - position[15];
+            Vector3 fdDirectionLH = (pointLH - position[15]).normalized;
             side1 = position[19] - position[15];
             side2 = position[17] - position[15];
             Vector3 upDirectionLH = Vector3.Cross(side2, side1).normalized;
@@ -72,7 +70,7 @@ public class CharacterIKController : MonoBehaviour
 
             // Set the right hand IK
             Vector3 pointRH = ((position[20] + position[18]) / 2.0f);
-            Vector3 fdDirectionRH = pointRH - position[16];
+            Vector3 fdDirectionRH = (pointRH - position[16]).normalized;
             side1 = position[20] - position[16];
             side2 = position[18] - position[16];
             Vector3 upDirectionRH = Vector3.Cross(side1, side2).normalized;
@@ -85,8 +83,9 @@ public class CharacterIKController : MonoBehaviour
             animator.SetIKRotation(AvatarIKGoal.RightHand, rotationRH);
 
             // Set the left foot IK
-            Vector3 directionLF = position[29].normalized;
-            Quaternion rotationLF = Quaternion.LookRotation(directionLF);
+            Vector3 fdDirectionLF = (position[31] - position[29]).normalized;
+            Vector3 upDirectionLF = (position[25] - position[27]).normalized;
+            Quaternion rotationLF = Quaternion.LookRotation(fdDirectionLF, upDirectionLF);
 
             animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1.0f);
             animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1.0f);
@@ -94,8 +93,9 @@ public class CharacterIKController : MonoBehaviour
             animator.SetIKRotation(AvatarIKGoal.LeftFoot, rotationLF);
 
             // Set the right foot IK
-            Vector3 directionRF = position[30].normalized;
-            Quaternion rotationRF = Quaternion.LookRotation(directionRF);
+            Vector3 fdDirectionRF = (position[32] - position[30]).normalized;
+            Vector3 upDirectionRF = (position[26] - position[28]).normalized;
+            Quaternion rotationRF = Quaternion.LookRotation(fdDirectionRF, upDirectionRF);
 
             animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1.0f);
             animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 1.0f);
