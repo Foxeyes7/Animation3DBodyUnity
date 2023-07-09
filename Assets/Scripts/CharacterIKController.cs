@@ -22,12 +22,9 @@ public class CharacterIKController : MonoBehaviour
         //refCube2 = Instantiate(prefabCube, new Vector3(0, 0, 0), Quaternion.identity);
         Debug.Log("Start called");
         animator = GetComponent<Animator>();
-        csvreader = csvReaderGameObject.GetComponent<csvReader>();// Supposant que le script csvReader est attaché au même GameObject
-        // Commence une Coroutine pour vérifier si gameObjects est prêt à être utilisé
+        csvreader = csvReaderGameObject.GetComponent<csvReader>();
         StartCoroutine(CheckForGameObjects());
     }
-
-    // Cette Coroutine est lancée après un délai défini et vérifie si gameObjects est prêt à être utilisé
     IEnumerator CheckForGameObjects()
     {
         // Attends 2 secondes pour donner à csvreader le temps d'instancier et de remplir gameObjects
@@ -62,8 +59,8 @@ public class CharacterIKController : MonoBehaviour
 
             Quaternion rotationLH = Quaternion.LookRotation(fdDirectionLH, upDirectionLH); 
 
-            animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1.0f);
-            animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1.0f);
+            animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0.5f);
+            animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 0.5f);
             animator.SetIKPosition(AvatarIKGoal.LeftHand, position[15]);
             animator.SetIKRotation(AvatarIKGoal.LeftHand, rotationLH);
 
@@ -77,8 +74,8 @@ public class CharacterIKController : MonoBehaviour
 
             Quaternion rotationRH = Quaternion.LookRotation(fdDirectionRH, upDirectionRH);
 
-            animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1.0f);
-            animator.SetIKRotationWeight(AvatarIKGoal.RightHand, 1.0f);
+            animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0.5f);
+            animator.SetIKRotationWeight(AvatarIKGoal.RightHand, 0.5f);
             animator.SetIKPosition(AvatarIKGoal.RightHand, position[16]);
             animator.SetIKRotation(AvatarIKGoal.RightHand, rotationRH);
 
@@ -87,8 +84,8 @@ public class CharacterIKController : MonoBehaviour
             Vector3 upDirectionLF = (position[25] - position[27]).normalized;
             Quaternion rotationLF = Quaternion.LookRotation(fdDirectionLF, upDirectionLF);
 
-            animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1.0f);
-            animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1.0f);
+            animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 0.5f);
+            animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 0.5f);
             animator.SetIKPosition(AvatarIKGoal.LeftFoot, position[27]);
             animator.SetIKRotation(AvatarIKGoal.LeftFoot, rotationLF);
 
@@ -97,8 +94,8 @@ public class CharacterIKController : MonoBehaviour
             Vector3 upDirectionRF = (position[26] - position[28]).normalized;
             Quaternion rotationRF = Quaternion.LookRotation(fdDirectionRF, upDirectionRF);
 
-            animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1.0f);
-            animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 1.0f);
+            animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 0.5f);
+            animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 0.5f);
             animator.SetIKPosition(AvatarIKGoal.RightFoot, position[28]);
             animator.SetIKRotation(AvatarIKGoal.RightFoot, rotationRF);
 

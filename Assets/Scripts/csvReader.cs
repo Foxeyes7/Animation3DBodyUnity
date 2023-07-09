@@ -24,6 +24,7 @@ public class csvReader : MonoBehaviour
 
     public Transform ikTarget;
 
+    private float nbframes;
 
     [SerializeField]
     private GameObject prefabCube, prefabEmpty, prefabLine;
@@ -89,8 +90,22 @@ public class csvReader : MonoBehaviour
             {
                 for (int i = 0; i < pointList.Count; i++)
                 {
-                    gameObjects[i].transform.position = globalListCam4[currentFrameOnVideo - frameDiff][i];
-                    position[i] = globalListCam4[currentFrameOnVideo - frameDiff][i];
+
+                    Debug.Log("Nbr frames detected : " + nbframes);
+                    Debug.Log("current frame on video : " + currentFrameOnVideo);
+                    Debug.Log("frame diff : " + frameDiff);
+                    Debug.Log("current frame on video - frame diff : " + (currentFrameOnVideo - frameDiff));
+
+                    if ((currentFrameOnVideo - frameDiff) < (nbframes - frameDiff - 3)) {
+                        position[i] = (globalListCam4[currentFrameOnVideo - frameDiff][i] + globalListCam4[currentFrameOnVideo - frameDiff+1][i] + globalListCam4[currentFrameOnVideo - frameDiff + 2][i]) /3.0f;
+                        
+                    }
+                    else
+                    {
+                        position[i] = globalListCam4[currentFrameOnVideo - frameDiff][i];
+                        Debug.Log("check");
+                    }
+                    gameObjects[i].transform.position = position[i];
                     GetPositions();
                 }
             }
@@ -205,7 +220,7 @@ public class csvReader : MonoBehaviour
         if (runExercice)
         {
             InstanciateCube();
-            InstanciateLines();
+            //InstanciateLines();
             text.text = dropdown.options[dropdown.value].text + " is running ...";
         }
         else
@@ -222,10 +237,11 @@ public class csvReader : MonoBehaviour
         List<List<Vector3>> globalList = new List<List<Vector3>>();
         
         bool endOfFile = false;
-
+        nbframes=0.0f;
         while (!endOfFile)
         {
             //endOfFile = true;
+
             string data_string = strReader.ReadLine();
             
             if(data_string == null)
@@ -233,6 +249,8 @@ public class csvReader : MonoBehaviour
                 endOfFile = true;
                 break;
             }
+
+            nbframes = nbframes+1.0f;
 
             string[] data_values = data_string.Split(',');
             float[] data_float = new float[data_values.Length];
@@ -247,7 +265,7 @@ public class csvReader : MonoBehaviour
 
             for (int i = 0; i < data_values.Length; i += 3)
             {
-                pointList.Add(new Vector3(data_float[i], data_float[i + 1], data_float[i + 2]));
+                    pointList.Add(new Vector3(data_float[i],data_float[i + 1],data_float[i + 2]));  
             }
             globalList.Add(pointList);
         }
@@ -266,7 +284,7 @@ public class csvReader : MonoBehaviour
             GameObject cube = Instantiate(prefabCube, globalListCam4[0][i], Quaternion.identity);
             cube.transform.SetParent(people.transform);
             cube.name = i.ToString();
-            //cube.GetComponent<Renderer>().enabled = false;
+            cube.GetComponent<Renderer>().enabled = false;// this line
             gameObjects.Add(cube);
 
         }
